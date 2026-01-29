@@ -1,41 +1,21 @@
 name: Evolution-Build-Process
-
-on:
-  push:
-    branches: [ "main", "master" ]
-  workflow_dispatch:
-
+on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-      # 1. Mengambil kode dari repo bos
       - uses: actions/checkout@v3
-
-      # 2. Setup Java (Wajib buat Android)
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '12.x'
-          cache: 'gradle'
-
-      # 3. Setup Flutter
+          java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0' # Versi stabil buat Android 11-16
           channel: 'stable'
-
-      # 4. Ambil library (pubspec.yaml)
       - run: flutter pub get
-
-      # 5. Proses Rakit APK Real
       - run: flutter build apk --release --no-tree-shake-icons
-
-      # 6. Upload hasil APK biar bisa di-download
-      - name: Upload Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
-          name: Evolution-Voxy-Final
+          name: Evolution-Final-APK
           path: build/app/outputs/flutter-apk/app-release.apk
-
