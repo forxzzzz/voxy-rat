@@ -17,5 +17,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
-          name: Evolution-Final-APK
+          name: Evolution-Voxy-Final
           path: build/app/outputs/flutter-apk/app-release.apk
